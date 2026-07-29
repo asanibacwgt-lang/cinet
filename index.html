@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasyBuy CI-Net Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
+body{background:#f4f6fb;color:#222}
+header{background:#081C7A;color:#fff;padding:18px 40px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:30px;font-weight:700}
+.logo span{color:#d71920}
+.container{max-width:1100px;margin:35px auto;padding:20px}
+.card{background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:30px}
+h1{text-align:center;color:#081C7A;margin-bottom:10px}
+.subtitle{text-align:center;color:#666;margin-bottom:25px}
+.upload{border:2px dashed #081C7A;border-radius:12px;padding:45px;text-align:center;cursor:pointer;transition:.3s}
+.upload:hover{background:#f5f8ff}
+input[type=file]{display:none}
+input[type=text]{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;margin-top:20px;font-size:16px}
+button{margin-top:20px;width:100%;padding:15px;background:#d71920;color:#fff;border:none;border-radius:10px;font-size:18px;cursor:pointer}
+button:hover{background:#b4141b}
+#loading{display:none;text-align:center;margin-top:20px;color:#081C7A;font-weight:bold}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin-top:30px}
+.box{background:#fff;border-radius:12px;padding:18px;border-left:6px solid #081C7A;box-shadow:0 5px 15px rgba(0,0,0,.05)}
+.box h3{font-size:15px;color:#666;margin-bottom:8px}
+.value{font-size:22px;font-weight:bold;color:#081C7A}
+.green{border-left-color:#28a745}.red{border-left-color:#dc3545}.orange{border-left-color:#ff9800}
+footer{text-align:center;margin:40px;color:#777}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">Easy<span>Buy</span></div>
+<div>تحليل تقرير CI-Net</div>
+</header>
+
+<div class="container">
+<div class="card">
+<h1>تحليل تقرير CI-Net</h1>
+<div class="subtitle">ارفع تقرير CI-Net بصيغة PDF للحصول على التحليل الائتماني وقرار EasyBuy.</div>
+
+<label class="upload">
+<input type="file" id="pdf" accept=".pdf">
+<div>📄 اضغط هنا أو اسحب ملف PDF</div>
+</label>
+
+<input type="text" id="civilId" placeholder="الرقم المدني (اختياري)">
+
+<button onclick="analyze()">تحليل التقرير</button>
+
+<div id="loading">⏳ جاري تحليل التقرير...</div>
+
+<div class="results">
+<div class="box green">
+<h3>القرار</h3>
+<div class="value" id="decision">---</div>
+</div>
+
+<div class="box">
+<h3>الراتب</h3>
+<div class="value" id="salary">---</div>
+</div>
+
+<div class="box">
+<h3>الأقساط الحالية</h3>
+<div class="value" id="installments">---</div>
+</div>
+
+<div class="box orange">
+<h3>نسبة المديونية</h3>
+<div class="value" id="ratio">---</div>
+</div>
+
+<div class="box">
+<h3>المتبقي</h3>
+<div class="value" id="remaining">---</div>
+</div>
+
+<div class="box">
+<h3>سبب القرار</h3>
+<div class="value" style="font-size:16px" id="reason">---</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<footer>EasyBuy Internal CI-Net Analyzer</footer>
+
+<script>
+async function analyze() {
+
+    const file = document.getElementById("pdf").files[0];
+
+    if (!file) {
+        alert("اختر ملف PDF أولاً");
+        return;
+    }
+
+    document.getElementById("loading").style.display = "block";
+
+    const webhook = "https://sandokhan.app.n8n.cloud/webhook-test/cinet-review";
+
+    const form = new FormData();
+    form.append("data", file);
+
+    try {
+
+        const response = await fetch(webhook, {
+            method: "POST",
+            body: form
+        });
+
+        console.log("Status:", response.status);
+
+        const text = await response.text();
+
+        console.log("Response:");
+        console.log(text);
+
+        alert(text);
+
+    } catch (e) {
+
+        console.error(e);
+        alert(e.message);
+
+    }
+
+    document.getElementById("loading").style.display = "none";
+}
+</script>
+
+</body>
+</html>
